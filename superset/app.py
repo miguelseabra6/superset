@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 def create_app(
     superset_config_module: Optional[str] = None,
-    superset_app_root: Optional[str] = None,
+    superset_app_root: Optional[str] = "/superset",
 ) -> Flask:
     app = SupersetApp(__name__)
 

@@ -1,0 +1,38 @@
+name: Create Helm Chart
+
+on:
+  workflow_dispatch:
+    inputs:
+      chart_name:
+        description: 'Custom superset'
+        required: true
+        default: 'superset'
+      app_version:
+        description: 'Application version'
+        required: false
+        default: '1.0.0'
+
+jobs:
+  create-chart:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+
+    - name: Create Helm Chart
+      run: |
+        helm create charts/${{ github.event.inputs.chart_name }}
+        
+        # Update Chart.yaml with custom app version
+        sed -i 's/appVersion: .*/appVersion: "${{ github.event.inputs.app_version }}"/' charts/${{ github.event.inputs.chart_name }}/Chart.yaml
+
+    - name: Commit and Push
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add charts/${{ github.event.inputs.chart_name }}
+        git commit -m "Add Helm chart: ${{ github.event.inputs.chart_name }}"
+        git push
